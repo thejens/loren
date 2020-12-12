@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="omnirender",
+    name="omniparse",
     version="0.0.1",
     author="Jens Larsson",
     author_email="jens.larsson56@gmail.com",
