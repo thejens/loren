@@ -4,11 +4,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="omniparse",
+    name="parender",
     version="0.0.1",
     author="Jens Larsson",
     author_email="jens.larsson56@gmail.com",
-    description="A package that reads arbitrary files from a file tree and creates a standardized dict or json dump", # noqa E501
+    description="A package with a powerful config parser and file renderer", # noqa E501
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/thejens/omnirender",

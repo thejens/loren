@@ -1,6 +1,6 @@
 import os
-from omniparse.file_loaders.base_loader import BaseLoader
-from omniparse.file_loaders.text_loader import TextLoader
+from parender.file_loaders.base_loader import BaseLoader
+from parender.file_loaders.text_loader import TextLoader
 
 
 def test_class():

@@ -1,5 +1,5 @@
-from omniparse.parsers.base_parser import BaseParser
-from omniparse.parsers.yaml_parser import YamlParser
+from parender.parsers.base_parser import BaseParser
+from parender.parsers.yaml_parser import YamlParser
 
 
 def test_class():

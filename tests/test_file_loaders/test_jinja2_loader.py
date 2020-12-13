@@ -1,6 +1,6 @@
 import os
-from omniparse.file_loaders.base_loader import BaseLoader
-from omniparse.file_loaders.jinja2_loader import Jinja2Loader
+from parender.file_loaders.base_loader import BaseLoader
+from parender.file_loaders.jinja2_loader import Jinja2Loader
 
 
 def test_class():

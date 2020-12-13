@@ -1,5 +1,5 @@
-from omniparse.parsers.base_parser import BaseParser
-from omniparse.parsers.csv_parser import CSVParser, TSVParser
+from parender.parsers.base_parser import BaseParser
+from parender.parsers.csv_parser import CSVParser, TSVParser
 
 csv_data = """a,b,c\n1,2,3\n4,5,6\na,"b,c",d"""
 

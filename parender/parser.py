@@ -1,4 +1,3 @@
-import argparse
 import warnings
 import json
 import yaml
@@ -11,8 +10,7 @@ try:
 except ImportError:
     warnings.warn("jsonschema not installed, not able to validate config")
 
-from pprint import pprint
-from os import listdir
+from os import listdir, makedirs
 from os.path import isfile, join
 
 from .parsers.base_parser import BaseParser
@@ -21,27 +19,29 @@ from .file_loaders.base_loader import BaseLoader
 from typing import Union, Dict, Type, Any, List, Callable
 
 DEFAULT_PARSERS: Dict[str, str] = {
-    "yaml": "omniparse.parsers.yaml_parser.YamlParser",
-    "yml": "omniparse.parsers.yaml_parser.YamlParser",
-    "json": "omniparse.parsers.json_parser.JSONParser",
-    "py": "omniparse.parsers.python_parser.PyParser",
-    "csv": "omniparse.parsers.csv_parser.CSVParser",
-    "tsv": "omniparse.parsers.csv_parser.TSVParser",
-    "*": "omniparse.parsers.text_parser.TextParser"
+    "yaml": "parender.parsers.yaml_parser.YamlParser",
+    "yml": "parender.parsers.yaml_parser.YamlParser",
+    "json": "parender.parsers.json_parser.JSONParser",
+    "py": "parender.parsers.python_parser.PyParser",
+    "csv": "parender.parsers.csv_parser.CSVParser",
+    "tsv": "parender.parsers.csv_parser.TSVParser",
+    "*": "parender.parsers.text_parser.TextParser"
 }
 
 DEFAULT_LOADERS: Dict[str, str] = {
-    "j2": "omniparse.file_loaders.jinja2_loader.Jinja2Loader",
-    "jinja2": "omniparse.file_loaders.jinja2_loader.Jinja2Loader",
-    "jpg": "omniparse.file_loaders.base64_loader.URLSafeBase64Loader",
-    "png": "omniparse.file_loaders.base64_loader.URLSafeBase64Loader",
-    "*": "omniparse.file_loaders.text_loader.TextLoader"
+    "j2": "parender.file_loaders.jinja2_loader.Jinja2Loader",
+    "jinja2": "parender.file_loaders.jinja2_loader.Jinja2Loader",
+    "jpg": "parender.file_loaders.base64_loader.URLSafeBase64Loader",
+    "png": "parender.file_loaders.base64_loader.URLSafeBase64Loader",
+    "*": "parender.file_loaders.text_loader.TextLoader"
 }
 
 
 DEFAULT_IGNORED_PATTERNS: List[str] = [
-    ".*",
-    "_*"
+    ".parender.yaml",
+    ".parenderignore",
+    "_*",
+    ".*"
 ]
 
 
@@ -49,7 +49,7 @@ DEFAULT_IGNORED_PATTERNS: List[str] = [
 def get_config(root_dir) -> Dict[str, Any]:
     print(root_dir)
     try:
-        with open(join(root_dir, ".omniparse.yaml"), "r") as f:
+        with open(join(root_dir, ".parender.yaml"), "r") as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
         return {}
@@ -88,7 +88,7 @@ def get_parser_class(class_ref) -> Type[BaseParser]:
 @functools.lru_cache()
 def get_ignore(base_path) -> Callable[[str], bool]:
     try:
-        with open(join(base_path, ".omniparseignore"), "r") as f:
+        with open(join(base_path, ".parenderignore"), "r") as f:
             spec = pathspec.PathSpec.from_lines('gitwildmatch', f)
     except FileNotFoundError:
         spec = pathspec.PathSpec.from_lines(
@@ -170,21 +170,11 @@ def validate(configurations: dict, schema_path: str) -> None:
         jsonschema.validate(configurations, json.load(schema))
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description='Transform a file-tree into a configuration blob'
-    )
-    parser.add_argument('path', type=str)
-    parser.add_argument('--output-file', type=str, default="")
-    parser.add_argument('--schema-file', type=str, default=False)
-    args = parser.parse_args()
+def init(path):
+    makedirs(path, exist_ok=True)
+    with open(join(path, ".parenderignore"), "w+") as f:
+        for row in DEFAULT_IGNORED_PATTERNS:
+            f.write(row+"\n")
 
-    configurations = parse(args.path)
-    if args.schema_file:
-        validate(configurations, args.schema_file)
-
-    if not args.output_file:
-        pprint(configurations)
-    else:
-        with open(args.output_file, "w+") as f:
-            f.write(json.dumps(configurations))
+    with open(join(path, ".parender.yaml"), "w+") as f:
+        yaml.dump({"parsers": DEFAULT_PARSERS, "loaders": DEFAULT_LOADERS}, f)

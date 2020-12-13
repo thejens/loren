@@ -1,5 +1,5 @@
-from omniparse.parsers.base_parser import BaseParser
-from omniparse.parsers.python_parser import PyParser
+from parender.parsers.base_parser import BaseParser
+from parender.parsers.python_parser import PyParser
 
 
 def test_class():

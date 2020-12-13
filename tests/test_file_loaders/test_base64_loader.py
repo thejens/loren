@@ -1,6 +1,6 @@
 import os
-from omniparse.file_loaders.base_loader import BaseLoader
-from omniparse.file_loaders.base64_loader import Base64Loader
+from parender.file_loaders.base_loader import BaseLoader
+from parender.file_loaders.base64_loader import Base64Loader
 
 
 def test_class():
