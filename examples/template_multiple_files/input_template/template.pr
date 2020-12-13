@@ -1,0 +1,11 @@
+=> example_result.html
+<html>
+  <head><link rel="stylesheet" href="example_result.css"></head>
+  <body>
+    <h1>{{ content.foo }}</h1>
+  </body>
+</html>
+=> example_result.css
+body {
+  background: {{ css.color }};
+}

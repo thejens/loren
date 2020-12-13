@@ -12,13 +12,13 @@ def action_render():
     )
     parser.add_argument('--template-path', type=str, required=True)
     parser.add_argument('--configuration-path', type=str, required=True)
-    parser.add_argument('--render-path', type=str, default="rendered")
+    parser.add_argument('--output-path', type=str, default="rendered")
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
 
     render(
         template_path=args.template_path,
-        render_path=args.render_path,
+        output_path=args.output_path,
         configurations=parse(args.configuration_path, **unknown_args),
         **unknown_args
     )
@@ -76,7 +76,7 @@ def package_unknown_args(arglist):
     key = "positional_args"
     for arg in arglist:
         if arg[0] == "-":
-            key = arg.strip("-")
+            key = arg.strip("-").replace("-", "_")
         else:
             if key in new_args:
                 if type(new_args[key]) is not list:

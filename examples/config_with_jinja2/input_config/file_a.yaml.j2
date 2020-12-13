@@ -1,0 +1,5 @@
+some_numbers:
+{%- for i in range(10) %}
+  - {{ i }}
+{% endfor %}
+parameter_from_call: {{ parameter_from_call }}

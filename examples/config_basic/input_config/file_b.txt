@@ -1,0 +1,2 @@
+Some text
+in a text file

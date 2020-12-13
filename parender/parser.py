@@ -4,6 +4,7 @@ import yaml
 import functools
 import importlib
 import pathspec
+import logging
 
 try:
     import jsonschema
@@ -47,7 +48,6 @@ DEFAULT_IGNORED_PATTERNS: List[str] = [
 
 @functools.lru_cache()
 def get_config(root_dir) -> Dict[str, Any]:
-    print(root_dir)
     try:
         with open(join(root_dir, ".parender.yaml"), "r") as f:
             return yaml.safe_load(f)
@@ -69,8 +69,6 @@ def get_loaders(base_path) -> Dict[str, str]:
 
 @functools.lru_cache()
 def get_loader_class(class_ref) -> Type[BaseLoader]:
-    print(".".join(class_ref.split(".")[:-1]))
-    print(class_ref.split(".")[-1])
     return getattr(
         importlib.import_module(".".join(class_ref.split(".")[:-1])),
         class_ref.split(".")[-1]
@@ -118,10 +116,10 @@ def parse(
 
         if isfile(item_path):
             if ignore_func(sub_path):
-                print(f"Ignoring: {sub_path}")
+                logging.debug(f"Ignoring: {sub_path}")
                 continue
             else:
-                print(f"Keeping: {sub_path}")
+                logging.debug(f"Keeping: {sub_path}")
 
             if extensions[-1] in loaders:
                 loader_extension = extensions[-1]
@@ -143,12 +141,6 @@ def parse(
             child = parsed_contents
             child["_path"] = item_path
         else:
-            if ignore_func(sub_path):
-                print(f"Ignoring: {sub_path}")
-                continue
-            else:
-                print(f"Keeping: {sub_path}")
-
             child = parse(
                 item_path,
                 base_path,
@@ -160,7 +152,7 @@ def parse(
                 f"due to multiple files/folders with same prefix in {path}"
             )
             configs[key].update(child)
-        else:
+        elif child:
             configs[key] = child
     return configs
 

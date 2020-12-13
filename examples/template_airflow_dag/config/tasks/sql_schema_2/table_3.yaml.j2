@@ -1,0 +1,6 @@
+owner: jens
+dag: hourly_dag
+depends_on:
+  - sql_schema_1.table_2
+query: |
+  SELECT a FROM sql_schema_1.table_2
