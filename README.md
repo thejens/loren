@@ -95,7 +95,7 @@ Pointing Loren to create a configuration from `folder` would generate:
   "sub_folder": {
     "file3": {
       "file_contents": "A man walks into a bar",
-      "_path": "files/sub_folder/file3.txt"
+      "_path": "files/sub_folder/file3.txt.j2"
     },
   }
 }
