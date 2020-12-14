@@ -66,7 +66,7 @@ Let's say you have the following file structure:
 |----file1.yaml
 |----file2.txt
 |----sub_folder
-|------file3.yaml
+|------file3.txt.j2
 ```
 `file1.yaml` contains:
 ```
