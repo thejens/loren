@@ -15,7 +15,8 @@ to navigate for a non-technical audience.
 However use-cases doesn't end there, you can use a Loren template and
 configuration to do things such as "translating a CSV file into one html-file
 per row", or genreating a massive single configuration file from a bunch of
-specialized
+specialized config files. (perhaps you want to split the airflow config into
+one file per section and have a script that merge the intelligently)
 
 ## How it works
 Loren will create a `configuration` by parsing all files in a file-tree,
