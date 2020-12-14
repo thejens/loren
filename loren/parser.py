@@ -20,27 +20,27 @@ from .file_loaders.base_loader import BaseLoader
 from typing import Union, Dict, Type, Any, List, Callable
 
 DEFAULT_PARSERS: Dict[str, str] = {
-    "yaml": "parender.parsers.yaml_parser.YamlParser",
-    "yml": "parender.parsers.yaml_parser.YamlParser",
-    "json": "parender.parsers.json_parser.JSONParser",
-    "py": "parender.parsers.python_parser.PyParser",
-    "csv": "parender.parsers.csv_parser.CSVParser",
-    "tsv": "parender.parsers.csv_parser.TSVParser",
-    "*": "parender.parsers.text_parser.TextParser"
+    "yaml": "loren.parsers.yaml_parser.YamlParser",
+    "yml": "loren.parsers.yaml_parser.YamlParser",
+    "json": "loren.parsers.json_parser.JSONParser",
+    "py": "loren.parsers.python_parser.PyParser",
+    "csv": "loren.parsers.csv_parser.CSVParser",
+    "tsv": "loren.parsers.csv_parser.TSVParser",
+    "*": "loren.parsers.text_parser.TextParser"
 }
 
 DEFAULT_LOADERS: Dict[str, str] = {
-    "j2": "parender.file_loaders.jinja2_loader.Jinja2Loader",
-    "jinja2": "parender.file_loaders.jinja2_loader.Jinja2Loader",
-    "jpg": "parender.file_loaders.base64_loader.URLSafeBase64Loader",
-    "png": "parender.file_loaders.base64_loader.URLSafeBase64Loader",
-    "*": "parender.file_loaders.text_loader.TextLoader"
+    "j2": "loren.file_loaders.jinja2_loader.Jinja2Loader",
+    "jinja2": "loren.file_loaders.jinja2_loader.Jinja2Loader",
+    "jpg": "loren.file_loaders.base64_loader.URLSafeBase64Loader",
+    "png": "loren.file_loaders.base64_loader.URLSafeBase64Loader",
+    "*": "loren.file_loaders.text_loader.TextLoader"
 }
 
 
 DEFAULT_IGNORED_PATTERNS: List[str] = [
-    ".parender.yaml",
-    ".parenderignore",
+    ".loren.yaml",
+    ".lorenignore",
     "_*",
     ".*"
 ]
@@ -49,7 +49,7 @@ DEFAULT_IGNORED_PATTERNS: List[str] = [
 @functools.lru_cache()
 def get_config(root_dir) -> Dict[str, Any]:
     try:
-        with open(join(root_dir, ".parender.yaml"), "r") as f:
+        with open(join(root_dir, ".loren.yaml"), "r") as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
         return {}
@@ -86,7 +86,7 @@ def get_parser_class(class_ref) -> Type[BaseParser]:
 @functools.lru_cache()
 def get_ignore(base_path) -> Callable[[str], bool]:
     try:
-        with open(join(base_path, ".parenderignore"), "r") as f:
+        with open(join(base_path, ".lorenignore"), "r") as f:
             spec = pathspec.PathSpec.from_lines('gitwildmatch', f)
     except FileNotFoundError:
         spec = pathspec.PathSpec.from_lines(
@@ -164,9 +164,9 @@ def validate(configurations: dict, schema_path: str) -> None:
 
 def init(path):
     makedirs(path, exist_ok=True)
-    with open(join(path, ".parenderignore"), "w+") as f:
+    with open(join(path, ".lorenignore"), "w+") as f:
         for row in DEFAULT_IGNORED_PATTERNS:
             f.write(row+"\n")
 
-    with open(join(path, ".parender.yaml"), "w+") as f:
+    with open(join(path, ".loren.yaml"), "w+") as f:
         yaml.dump({"parsers": DEFAULT_PARSERS, "loaders": DEFAULT_LOADERS}, f)

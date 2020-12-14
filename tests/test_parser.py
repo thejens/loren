@@ -1,6 +1,6 @@
 import os
 
-from parender.parser import (
+from loren.parser import (
     get_config,
     get_parsers,
     DEFAULT_PARSERS,
@@ -13,17 +13,17 @@ from parender.parser import (
     validate
 )
 
-from parender.file_loaders.base_loader import BaseLoader
-from parender.parsers.base_parser import BaseParser
+from loren.file_loaders.base_loader import BaseLoader
+from loren.parsers.base_parser import BaseParser
 
 
 def create_context(tmp_path):
-    with open(f"{tmp_path}/.parender.yaml", "w+") as conf_file:
+    with open(f"{tmp_path}/.loren.yaml", "w+") as conf_file:
         conf_file.write("parsers:\n")
-        conf_file.write("  yaml: parender.parsers.yaml_parser.YamlParser\n")
+        conf_file.write("  yaml: loren.parsers.yaml_parser.YamlParser\n")
         conf_file.write("loaders:\n")
-        conf_file.write('  "*": parender.file_loaders.text_loader.TextLoader\n') # noqa E501
-    with open(f"{tmp_path}/.parenderignore", "w+") as ignore_file:
+        conf_file.write('  "*": loren.file_loaders.text_loader.TextLoader\n') # noqa E501
+    with open(f"{tmp_path}/.lorenignore", "w+") as ignore_file:
         ignore_file.write(".*\n_*")
     with open(f"{tmp_path}/_ignored_underscore.py", "w+") as ignored_file:
         ignored_file.write("\n")
@@ -42,7 +42,7 @@ def create_context(tmp_path):
 def test_get_config(tmp_path):
     create_context(tmp_path)
     conf = get_config(tmp_path)
-    assert conf["parsers"]["yaml"] == "parender.parsers.yaml_parser.YamlParser" # noqa E501
+    assert conf["parsers"]["yaml"] == "loren.parsers.yaml_parser.YamlParser" # noqa E501
 
 
 def test_get_default_config():
@@ -53,7 +53,7 @@ def test_get_default_config():
 def test_get_parsers(tmp_path):
     create_context(tmp_path)
     parsers = get_parsers(tmp_path)
-    assert parsers["yaml"] == "parender.parsers.yaml_parser.YamlParser"
+    assert parsers["yaml"] == "loren.parsers.yaml_parser.YamlParser"
     assert parsers != DEFAULT_PARSERS
 
 
@@ -65,7 +65,7 @@ def test_get_default_parsers():
 def test_get_loaders(tmp_path):
     create_context(tmp_path)
     loaders = get_loaders(tmp_path)
-    assert loaders["*"] == "parender.file_loaders.text_loader.TextLoader"
+    assert loaders["*"] == "loren.file_loaders.text_loader.TextLoader"
     assert loaders != DEFAULT_LOADERS
 
 
@@ -76,14 +76,14 @@ def test_get_default_loaders():
 
 def test_get_loader_class():
     assert issubclass(
-        get_loader_class("parender.file_loaders.text_loader.TextLoader"),
+        get_loader_class("loren.file_loaders.text_loader.TextLoader"),
         BaseLoader
     )
 
 
 def test_get_parser_class():
     assert issubclass(
-        get_parser_class("parender.parsers.yaml_parser.YamlParser"),
+        get_parser_class("loren.parsers.yaml_parser.YamlParser"),
         BaseParser
     )
 
@@ -91,8 +91,8 @@ def test_get_parser_class():
 def test_get_ignore(tmp_path):
     create_context(tmp_path)
     ignore = get_ignore(tmp_path)
-    assert ignore('.parender.yaml')
-    assert ignore('.parenderignore')
+    assert ignore('.loren.yaml')
+    assert ignore('.lorenignore')
     assert ignore('_ignored_underscore.py')
     assert ignore('level_1/level_2/_ignored_underscore_2.py')
     assert not ignore('level_1/level_2/file.yaml')

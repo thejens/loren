@@ -2,7 +2,7 @@ import json
 import os
 from pprint import pprint
 from argparse import ArgumentParser
-from parender import parse, validate, render, init
+from loren import parse, validate, render, init
 from os.path import dirname
 
 

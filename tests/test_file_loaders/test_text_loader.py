@@ -1,6 +1,6 @@
 import os
-from parender.file_loaders.base_loader import BaseLoader
-from parender.file_loaders.text_loader import TextLoader
+from loren.file_loaders.base_loader import BaseLoader
+from loren.file_loaders.text_loader import TextLoader
 
 
 def test_class():

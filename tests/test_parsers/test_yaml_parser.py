@@ -1,5 +1,5 @@
-from parender.parsers.base_parser import BaseParser
-from parender.parsers.yaml_parser import YamlParser
+from loren.parsers.base_parser import BaseParser
+from loren.parsers.yaml_parser import YamlParser
 
 
 def test_class():

@@ -1,5 +1,5 @@
-from parender.parsers.base_parser import BaseParser
-from parender.parsers.python_parser import PyParser
+from loren.parsers.base_parser import BaseParser
+from loren.parsers.python_parser import PyParser
 
 
 def test_class():

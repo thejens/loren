@@ -9,4 +9,4 @@ files are stored.
 Note how {% raw %} is used in jinja2 to keep some brackets for Airflow's
 templating.
 
-`python -m parender render --configuration-path examples/template_airflow_dag/config/ --template-path examples/template_airflow_dag/dag_template.py.j2 --output-path examples/template_airflow_dag/result_dags/`
+`python -m loren render --configuration-path examples/template_airflow_dag/config/ --template-path examples/template_airflow_dag/dag_template.py.j2 --output-path examples/template_airflow_dag/result_dags/`
