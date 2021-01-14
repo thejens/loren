@@ -56,7 +56,8 @@ def action_dump():
     parser.add_argument('--output-path', type=str, required=True)
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
-    os.makedirs(dirname(args.output_path), exist_ok=True)
+    if dirname(args.output_path):
+        os.makedirs(dirname(args.output_path), exist_ok=True)
     with open(args.output_path, "w+") as f:
         json.dump(parse(args.configuration_path, **unknown_args), f)
 
