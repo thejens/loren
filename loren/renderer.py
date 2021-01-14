@@ -27,7 +27,8 @@ def render(
         _read_template(template_path).render(
             **configurations,
             **template_functions,
-            env=dict(environ)
+            env=dict(environ),
+            re=re
         ),
         0,
         re.MULTILINE

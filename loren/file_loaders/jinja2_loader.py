@@ -1,5 +1,6 @@
 import jinja2
 import os
+import re
 from .base_loader import BaseLoader
 
 template_functions = {
@@ -17,4 +18,4 @@ class Jinja2Loader(BaseLoader):
         loader = jinja2.FileSystemLoader(root_path)
         templateEnv = jinja2.Environment(loader=loader)
         template = templateEnv.get_template(template_path)
-        return template.render(env=os.environ, **template_functions, **kwargs)
+        return template.render(env=os.environ, re=re, **template_functions, **kwargs)

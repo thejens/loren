@@ -138,7 +138,7 @@ def parse(
             raw_contents = loader.load(item_path, base_path, **kwargs)
             parsed_contents = parser.parse(raw_contents)
 
-            child = parsed_contents
+            child = parsed_contents if parsed_contents else {}
             child["_path"] = item_path
         else:
             child = parse(

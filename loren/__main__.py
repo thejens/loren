@@ -90,7 +90,8 @@ def package_unknown_args(arglist):
 
 if __name__ == "__main__":
     parser = ArgumentParser(
-        description='Parse file trees to config, generate files from configs'
+        description='Parse file trees to config, generate files from configs'+ \
+                    'One of render, validate, print, dump or init'
     )
     parser.add_argument('action', type=str)
     action = parser.parse_known_args()[0].action
