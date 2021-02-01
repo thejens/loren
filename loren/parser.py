@@ -41,6 +41,7 @@ DEFAULT_LOADERS: Dict[str, str] = {
 DEFAULT_IGNORED_PATTERNS: List[str] = [
     ".loren.yaml",
     ".lorenignore",
+    ".DS_Store",
     "_*",
     ".*"
 ]
