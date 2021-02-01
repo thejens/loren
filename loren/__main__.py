@@ -91,8 +91,9 @@ def package_unknown_args(arglist):
 
 if __name__ == "__main__":
     parser = ArgumentParser(
-        description='Parse file trees to config, generate files from configs'+ \
-                    'One of render, validate, print, dump or init'
+        description='Parse file trees to config, generate files from configs' +
+                    '\n\nSupply One of [render, validate, print, dump, init]' +
+                    '\n as first argument'
     )
     parser.add_argument('action', type=str)
     action = parser.parse_known_args()[0].action
@@ -111,3 +112,6 @@ if __name__ == "__main__":
 
     elif action == "init":
         action_init()
+
+    else:
+        parser.print_help()
