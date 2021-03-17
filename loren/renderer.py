@@ -34,8 +34,8 @@ def render(
         re.MULTILINE
     )
     if len(files) == 1:
-        with open(output_path, "w+") as f:
-            f.write(files[0])
+        with open(output_path, "wb") as f:
+            f.write(files[0].encode('utf-8'))
     else:
         for result in files[1:]:
             file_name, file_contents = result.split('\n', 1)
@@ -43,5 +43,5 @@ def render(
             result_folder = '/'.join(result_path.split("/")[:-1])
             if not isdir(result_folder):
                 makedirs(result_folder)
-            with open(result_path, "w+") as f:
-                f.write(file_contents)
+            with open(result_path, "wb") as f:
+                f.write(file_contents.encode('utf-8'))

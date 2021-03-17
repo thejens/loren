@@ -1,1 +1,1 @@
-{"file_a": {"foo": "bar", "bar": [1, 2, 3], "_path": "examples/basic_config/input_config/file_a.yaml"}, "file_b": {"file_contents": "Some text\nin a text file\n", "_path": "examples/basic_config/input_config/file_b.txt"}}
+{"file_a": {"foo": "bar", "bar": [1, 2, 3], "_path": "examples/config_basic/input_config/file_a.yaml"}, "file_b": {"file_contents": "Some text\nin a text file\n", "_path": "examples/config_basic/input_config/file_b.txt"}}
