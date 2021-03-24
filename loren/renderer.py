@@ -1,5 +1,6 @@
 import jinja2
 import re
+import codecs
 from os import makedirs, environ
 from os.path import join, isdir
 
@@ -34,8 +35,8 @@ def render(
         re.MULTILINE
     )
     if len(files) == 1:
-        with open(output_path, "wb") as f:
-            f.write(files[0].encode('utf-8'))
+        with codecs.open(output_path, 'w', 'utf-8') as f:
+            f.write(str(files[0]))
     else:
         for result in files[1:]:
             file_name, file_contents = result.split('\n', 1)
@@ -43,5 +44,5 @@ def render(
             result_folder = '/'.join(result_path.split("/")[:-1])
             if not isdir(result_folder):
                 makedirs(result_folder)
-            with open(result_path, "wb") as f:
-                f.write(file_contents.encode('utf-8'))
+            with codecs.open(result_path, "w", 'utf-8') as f:
+                f.write(str(file_contents))
