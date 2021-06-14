@@ -49,7 +49,7 @@ delimiters, the output path will be interpreted as a file name.
 By default Loren will treat the following extensions:
 * `.yaml` & `.yml`: Will be parsed using a Yaml parser and added in its entirety to the `configuration`
 * `.json`: Will be parsed using a JSON parser and added in its entirety to the `configuration`
-* `.py`: Will be executed and the namespace stored under `py_vars` in a dict in the `configuration`
+* `.py`: Will be executed and the namespace stored in a dict in the `configuration`
 * `.csv` & `.tsv`: Will be parsed and added as a list of dict under the key `rows` in a dict. The first row is used as a header, and `,` or `\t` used as separators for the respective formats.
 * Other files are, by default, read as text-files where the contents are added under the key `file_contents`
 

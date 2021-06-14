@@ -7,4 +7,4 @@ def test_class():
 
 
 def test_csv_parser():
-    assert PyParser.parse('a = 1') == {"py_vars": {"a": 1}}
+    assert PyParser.parse('a = 1') == {"a": 1}

@@ -1,1 +1,1 @@
-{"file": {"py_vars": {"a": 10, "b": "test"}, "_path": "examples/config_with_python/input_config/file.py"}}
+{"file": {"a": 10, "b": "test", "_path": "examples/config_with_python/input_config/file.py"}}

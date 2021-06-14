@@ -8,4 +8,4 @@ class PyParser(BaseParser):
     def parse(file_contents: str) -> Dict[str, Any]:
         local_vars: Dict[str, Any] = {}
         exec(file_contents, {}, local_vars)
-        return {"py_vars": local_vars}
+        return local_vars
