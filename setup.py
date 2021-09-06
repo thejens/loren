@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="loren",
-    version="0.0.1",
+    version="0.0.2",
     author="Jens Larsson",
     author_email="jens.larsson56@gmail.com",
     description="A package with a powerful config parser and file renderer", # noqa E501

@@ -112,6 +112,34 @@ def test_parse(tmp_path):
         '_path': f'{tmp_path}/level_1/level_2/file.yaml'
     }
 
+def test_parse_include(tmp_path):
+    create_context(tmp_path)
+    conf = parse(
+        str(tmp_path),
+        included_file_prefixes=[f'{tmp_path}/level_1/level_2/']
+    )
+    print(conf)
+    assert "file" not in conf["level_1"]
+
+    assert conf["level_1"]["level_2"]["file"] == {
+        'foo': 'bar',
+        '_path': f'{tmp_path}/level_1/level_2/file.yaml'
+    }
+
+def test_parse_exclude(tmp_path):
+    create_context(tmp_path)
+    conf = parse(
+        str(tmp_path),
+        excluded_file_prefixes=[f'{tmp_path}/level_1/level_2/']
+    )
+    assert "level_2" not in conf["level_1"]
+
+    assert conf["level_1"]["file"] == {
+        'bar': 'baz',
+        '_path':
+        f'{tmp_path}/level_1/file.yaml'
+    }
+
 
 def test_validate(tmp_path):
     with open(f"{tmp_path}/correct_schema.yaml", "w+") as schema_file:

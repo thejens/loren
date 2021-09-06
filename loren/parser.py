@@ -100,6 +100,8 @@ def get_ignore(base_path) -> Callable[[str], bool]:
 def parse(
     path: str,
     base_path: Union[None, str] = None,
+    included_file_prefixes: Union[None, List[str]] = None,
+    excluded_file_prefixes: Union[None, List[str]] = None,
     **kwargs
 ) -> Dict:
     if not base_path:
@@ -107,18 +109,29 @@ def parse(
     parsers = get_parsers(base_path)
     loaders = get_loaders(base_path)
     ignore_func = get_ignore(base_path)
-
     configs: Dict[str, Any] = {}
+    
     for item in listdir(path):
         item_path = join(path, item)
         extensions = item.split(".")
         key = extensions[0]
         sub_path = item_path[len(base_path):].strip("/")
 
+        if (
+            excluded_file_prefixes is not None
+            and any(item_path.startswith(prefix) for prefix in excluded_file_prefixes)
+        ):
+            continue
+
         if isfile(item_path):
-            if ignore_func(sub_path):
-                logging.debug(f"Ignoring: {sub_path}")
-                continue
+            if (
+                (
+                    included_file_prefixes is not None and
+                    not any(item_path.startswith(prefix) for prefix in included_file_prefixes)
+                ) or ignore_func(sub_path)
+            ):
+                    logging.debug(f"Ignoring: {sub_path}")
+                    continue
             else:
                 logging.debug(f"Keeping: {sub_path}")
 
@@ -145,6 +158,8 @@ def parse(
             child = parse(
                 item_path,
                 base_path,
+                included_file_prefixes,
+                excluded_file_prefixes,
                 **kwargs
             )
         if key in configs:
