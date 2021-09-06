@@ -109,8 +109,6 @@ def parse(
     parsers = get_parsers(base_path)
     loaders = get_loaders(base_path)
     ignore_func = get_ignore(base_path)
-    print("ABC: ")
-    print(included_file_prefixes)
     configs: Dict[str, Any] = {}
     
     for item in listdir(path):
