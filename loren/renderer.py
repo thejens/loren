@@ -1,6 +1,7 @@
 import jinja2
 import re
 import codecs
+from jinja2 import Undefined, StrictUndefined
 from os import makedirs, environ
 from os.path import join, isdir
 
@@ -13,19 +14,23 @@ template_functions = {
 }
 
 
-def _read_template(template_path: str) -> jinja2.Template:
+def _read_template(template_path: str, strict: bool) -> jinja2.Template:
     with open(template_path, "r") as template_file:
-        return jinja2.Template(template_file.read())
+        return jinja2.Template(
+            template_file.read(),
+            undefined=StrictUndefined if strict else Undefined
+        )
 
 
 def render(
     template_path: str,
     output_path: str,
-    configurations: dict
+    configurations: dict,
+    strict: bool=False
 ) -> None:
     files = re.split(
         r"^=>",
-        _read_template(template_path).render(
+        _read_template(template_path, strict).render(
             **configurations,
             **template_functions,
             env=dict(environ),
