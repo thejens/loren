@@ -171,7 +171,7 @@ it doesn't have support for.
 
 ## Install
 For now, clone this repo and run:
-`python -m pip install -r https://raw.githubusercontent.com/thejens/parender/main/requirements.txt`
+`python -m pip install -r https://raw.githubusercontent.com/thejens/loren/main/requirements.txt`
 `python -m pip install git+https://github.com/thejens/loren.git`
 
 ## Run
