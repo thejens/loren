@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "file_a": {
+      "type": "object",
+      "properties": {
+        "bar": {
+          "type": "array",
+          "items": {
+                "type": "integer"
+            }
+        },
+        "foo": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bar",
+        "foo"
+      ]
+    }
+  },
+  "required": [
+    "file_a"
+  ]
+}

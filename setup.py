@@ -5,13 +5,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="loren",
-    version="0.0.2",
+    version="0.0.3",
     author="Jens Larsson",
     author_email="jens.larsson56@gmail.com",
     description="A package with a powerful config parser and file renderer", # noqa E501
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/thejens/omnirender",
+    url="https://github.com/thejens/loren",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
