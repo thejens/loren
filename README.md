@@ -170,7 +170,8 @@ other files. Omiting the `*` will make Loren crash if it comes across a file
 it doesn't have support for.
 
 ## Install
-For now, clone this repo and run:
+For now, clone this repo or run:
+
 `python -m pip install -r https://raw.githubusercontent.com/thejens/loren/main/requirements.txt`
 `python -m pip install git+https://github.com/thejens/loren.git`
 
