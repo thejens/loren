@@ -13,9 +13,16 @@ def action_render():
     parser.add_argument('--template-path', type=str, required=True)
     parser.add_argument('--configuration-path', type=str, required=True)
     parser.add_argument('--output-path', type=str, default="rendered")
+    parser.add_argument('--schema-path', type=str, default=None)
     parser.add_argument('--strict', default=False, action='store_true')
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
+
+    if args.schema_path:
+        validate(
+            configurations=parse(args.configuration_path, **unknown_args),
+            schema_path=args.schema_path
+        )
 
     render(
         template_path=args.template_path,
