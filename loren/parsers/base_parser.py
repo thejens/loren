@@ -3,6 +3,6 @@ from typing import Dict, Any
 
 class BaseParser(object):
 
-    @staticmethod
-    def parse(file_contents: str) -> Dict[str, Any]:
+    @classmethod
+    def parse(cls, file_contents: str, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError()

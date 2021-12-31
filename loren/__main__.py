@@ -2,7 +2,9 @@ import json
 import os
 from pprint import pprint
 from argparse import ArgumentParser
-from loren import parse, validate, render, init
+from load import LorenDict
+from renderer import render
+from configuration import init_configuration
 from os.path import dirname
 
 
@@ -18,16 +20,14 @@ def action_render():
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
 
+    configurations = LorenDict(args.configuration_path)
     if args.schema_path:
-        validate(
-            configurations=parse(args.configuration_path, **unknown_args),
-            schema_path=args.schema_path
-        )
+        configurations.validate(args.schema_path)
 
     render(
         template_path=args.template_path,
         output_path=args.output_path,
-        configurations=parse(args.configuration_path, **unknown_args),
+        configurations=LorenDict,
         strict=args.strict,
         **unknown_args
     )
@@ -41,10 +41,8 @@ def action_validate():
     parser.add_argument('--schema-path', type=str, required=True)
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
-    validate(
-        configurations=parse(args.configuration_path, **unknown_args),
-        schema_path=args.schema_path
-    )
+    if args.schema_path:
+        LorenDict(args.configuration_path).validate(args.schema_path)
 
 
 def action_print():
@@ -54,7 +52,7 @@ def action_print():
     parser.add_argument('--configuration-path', type=str, required=True)
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
-    pprint(parse(args.configuration_path, **unknown_args))
+    pprint(LorenDict(args.configuration_path).to_dict())
 
 
 def action_dump():
@@ -68,7 +66,7 @@ def action_dump():
     if dirname(args.output_path):
         os.makedirs(dirname(args.output_path), exist_ok=True)
     with open(args.output_path, "w+") as f:
-        json.dump(parse(args.configuration_path, **unknown_args), f)
+        json.dump(LorenDict(args.configuration_path, lazy=False), f)
 
 
 def action_init():
@@ -77,7 +75,7 @@ def action_init():
     )
     parser.add_argument('--configuration-path', type=str, required=True)
     args, _ = parser.parse_known_args()
-    init(args.configuration_path)
+    init_configuration(args.configuration_path)
 
 
 def package_unknown_args(arglist):
