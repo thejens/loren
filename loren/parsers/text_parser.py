@@ -1,9 +1,8 @@
 from typing import Dict, Any
-from parsers.base_parser import BaseParser
+from loren.parsers.base_parser import BaseParser
 
 
 class TextParser(BaseParser):
-
     @staticmethod
     def parse(file_contents: str, **kwargs) -> Dict[str, Any]:
         try:

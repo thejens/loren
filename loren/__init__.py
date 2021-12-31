@@ -1,2 +1,2 @@
-from load import LorenDict
-from renderer import render # noqa F401
+from loren.load import LorenDict
+from loren.render import render

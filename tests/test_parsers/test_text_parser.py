@@ -7,4 +7,4 @@ def test_class():
 
 
 def test_csv_parser():
-    assert TextParser.parse('a = 1') == {"file_contents": 'a = 1'}
+    assert TextParser.parse("a = 1") == {"file_contents": "a = 1"}

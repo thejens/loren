@@ -1,6 +1,6 @@
 import csv
 from typing import Dict, Any
-from parsers.base_parser import BaseParser
+from loren.parsers.base_parser import BaseParser
 
 
 class CSVParser(BaseParser):
@@ -16,9 +16,9 @@ class CSVParser(BaseParser):
             file_contents = file_contents.decode("utf-8")
         except (UnicodeDecodeError, AttributeError):
             pass
-        return {"rows": list(
-            csv.DictReader(file_contents.splitlines(), delimiter=cls.sep)
-        )}
+        return {
+            "rows": list(csv.DictReader(file_contents.splitlines(), delimiter=cls.sep))
+        }
 
 
 class TSVParser(CSVParser):

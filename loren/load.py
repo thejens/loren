@@ -1,24 +1,22 @@
-
 import os
-import yaml
-import pathspec
 import functools
 import importlib
 
 from collections.abc import Mapping
-from typing import Dict, Any, Type
+from typing import Dict, Any, Type, List
 from functools import cached_property
-from parsers.base_parser import BaseParser
-from file_reader import LorenFileReader
-
+from loren.parsers.base_parser import BaseParser
+from loren.utilities.file_reader import LorenFileReader
+from loren.utilities.configuration import get_configuration
 
 
 @functools.lru_cache()
 def get_parser_class(class_ref) -> Type[BaseParser]:
     return getattr(
         importlib.import_module(".".join(class_ref.split(".")[:-1])),
-        class_ref.split(".")[-1]
+        class_ref.split(".")[-1],
     )
+
 
 def recursive_dict_update(d: dict, u: dict) -> None:
     for k, v in u.items():
@@ -27,51 +25,59 @@ def recursive_dict_update(d: dict, u: dict) -> None:
         elif isinstance(v, Mapping):
             recursive_dict_update(d[k], v)
 
+
 class NotInitiated(object):
     def __init__(self, sources):
         self.sources = sources
 
+
 class LorenDict(dict):
-    def __new__(cls, root_path=".", lazy=True, preserve_file_suffix=False, config=None):
-
-        if isinstance(root_path, str):
-            return super().__new__(cls, root_path, lazy, preserve_file_suffix, config)
-        
-        elif isinstance(root_path, dict):
-            return {
-                k: super().__new__(cls, v, lazy, preserve_file_suffix, config)
-                for k, v in root_path.items()
-            }
-
-        elif isinstance(root_path, list):
-            return [
-                super().__new__(cls, v, lazy, preserve_file_suffix, config)
-                for v in root_path
-            ]
-
-    def __init__(self, root_path=".", lazy=True, preserve_file_suffix=False, config=None):
-        self.root_path = root_path.rstrip("/")
+    def __init__(
+        self,
+        root_path=".",
+        lazy=True,
+        preserve_file_suffix=False,
+        config=None,
+        additional_args=None,
+    ):
         self.lazy = lazy
         self.preserve_file_suffix = preserve_file_suffix
-        self.config = config
-        if self.config is None:
-            try:
-                with open(os.path.join(self.root_path, ".loren.yml"), "r") as f:
-                    self.config = yaml.safe_load(f)
-            except FileNotFoundError:
-                self.config = DEFAULT_CONFIG
-            
-            self.config["ignore"] = pathspec.PathSpec.from_lines(
-                'gitwildmatch', 
-                self.config.get("ignore", [])
-            )
-            self.config["base_path"] = self.root_path
-        
-        for key, sources in self.sources.items():
-            if lazy:
-                self[key] = NotInitiated(sources)
+        if additional_args is None:
+            self.additional_args = {}
+        else:
+            self.additional_args = additional_args
+
+        if isinstance(root_path, Mapping):
+            for key, path in root_path.items():
+                self[key] = LorenDict(
+                    path, lazy, preserve_file_suffix, config, additional_args
+                )
+
+        elif isinstance(root_path, (set, list)):
+            for i, path in enumerate(root_path):
+                self[i] = LorenDict(
+                    path, lazy, preserve_file_suffix, config, additional_args
+                )
+
+        else:
+            root_path = str(root_path)
+            if os.path.isfile(root_path):
+                self.config = get_configuration(root_path)
+                self.sources = [root_path]
+                recursive_dict_update(self, self._file_loader(root_path))
+
             else:
-                self._init_key(key, sources)      
+                self.root_path = root_path.rstrip("/")
+                if config is None:
+                    self.config = get_configuration(root_path)
+                else:
+                    self.config = config
+
+                for key, sources in self.sources.items():
+                    if lazy:
+                        self[key] = NotInitiated(sources)
+                    else:
+                        self._init_key(key, sources)
 
     def _init_keys(self):
         for key, value in self.items():
@@ -83,7 +89,9 @@ class LorenDict(dict):
             if key not in self or type(super().__getitem__(key)) == NotInitiated:
                 self[key] = self._file_loader(source)
             else:
-                recursive_dict_update(super().__getitem__(key), self._file_loader(source))
+                recursive_dict_update(
+                    super().__getitem__(key), self._file_loader(source)
+                )
 
     def __getitem__(self, key):
         if self.lazy:
@@ -99,30 +107,31 @@ class LorenDict(dict):
     def _file_loader(self, path: str) -> Dict[str, Any]:
         if os.path.isdir(path):
             return LorenDict(
-                root_path=path, 
+                root_path=path,
                 lazy=self.lazy,
                 preserve_file_suffix=self.preserve_file_suffix,
-                config=self.config
+                config=self.config,
+                additional_args=self.additional_args,
             )
-        file_contents = LorenFileReader.load(path)
+        file_contents = LorenFileReader.read(path)
         parsed_file_contents = file_contents
-        for file_extension in reversed(path.split(".")[1:]):
+        for file_extension in reversed(path.strip(".").split(".")[1:]):
             if isinstance(parsed_file_contents, dict):
                 parsed_file_contents = parsed_file_contents["file_contents"]
-            
+
             parser_class_path = self.config["file_handlers"].get(
-                file_extension,
-                self.config["file_handlers"]["*"]
+                file_extension, self.config["file_handlers"]["*"]
             )
             parser_class = get_parser_class(parser_class_path)
             parsed_file_contents = parser_class.parse(
                 file_contents=parsed_file_contents,
                 file_path=path,
-                root_path=self.config["base_path"]
+                root_path=self.config["base_path"],
+                additional_args=self.additional_args,
             )
         return parsed_file_contents
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         self._init_keys()
         for key, value in self.items():
             if isinstance(value, LorenDict):
@@ -130,23 +139,24 @@ class LorenDict(dict):
         return dict(self)
 
     @cached_property
-    def sources(self):
+    def sources(self) -> Dict[str, List[str]]:
         source_files = {}
         for item in os.scandir(self.root_path):
             if self._ignore_func(item):
                 continue
-                
+
             item_name = item.name
-            
+
             if not self.preserve_file_suffix:
                 item_name = item_name.split(".")[0]
-            
+
             source_files.setdefault(item_name, []).append(item.path)
         return source_files
-    
-    def _ignore_func(self, item):
+
+    def _ignore_func(self, item: os.DirEntry):
         return self.config["ignore"].match_file(
-            item.path[len(self.config["base_path"])+1:] + ("/" if item.is_dir() else "")
+            item.path[len(self.config["base_path"]) + 1 :]
+            + ("/" if item.is_dir() else "")
         )
 
     def __repr__(self):
@@ -174,5 +184,3 @@ class LorenDict(dict):
 
         with open(schema_path, "r") as schema:
             jsonschema.validate(self.to_dict(), json.load(schema))
-
-print(LorenDict("tmp/test", lazy=False, preserve_file_suffix=False))

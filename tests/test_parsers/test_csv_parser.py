@@ -11,19 +11,19 @@ def test_class():
 
 def test_csv_parser():
     assert CSVParser.parse(csv_data) == {
-      "rows": [
-        {"a": "1", "b": "2", "c": "3"},
-        {"a": "4", "b": "5", "c": "6"},
-        {"a": "a", "b": "b,c", "c": "d"},
-      ]
+        "rows": [
+            {"a": "1", "b": "2", "c": "3"},
+            {"a": "4", "b": "5", "c": "6"},
+            {"a": "a", "b": "b,c", "c": "d"},
+        ]
     }
 
 
 def test_tsv_parser():
     assert TSVParser.parse(csv_data.replace(",", "\t")) == {
-      "rows": [
-        {"a": "1", "b": "2", "c": "3"},
-        {"a": "4", "b": "5", "c": "6"},
-        {"a": "a", "b": "b\tc", "c": "d"},
-      ]
+        "rows": [
+            {"a": "1", "b": "2", "c": "3"},
+            {"a": "4", "b": "5", "c": "6"},
+            {"a": "a", "b": "b\tc", "c": "d"},
+        ]
     }
