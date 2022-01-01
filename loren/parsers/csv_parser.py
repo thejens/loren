@@ -11,15 +11,14 @@ class CSVParser(BaseParser):
         return row.split(cls.sep)
 
     @classmethod
-    def parse(cls, file_contents: str, **kwargs) -> Dict[str, Any]:
+    def parse(cls, data: Dict[str, str], **kwargs) -> Dict[str, Any]:
         try:
-            file_contents = file_contents.decode("utf-8")
-        except (UnicodeDecodeError, AttributeError):
-            pass
+            file_contents = data["file_contents"].decode("utf-8")
+        except AttributeError:
+            file_contents = data["file_contents"]
         return {
             "rows": list(csv.DictReader(file_contents.splitlines(), delimiter=cls.sep))
         }
-
 
 class TSVParser(CSVParser):
     sep = "\t"

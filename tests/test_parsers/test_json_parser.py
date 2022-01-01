@@ -6,5 +6,5 @@ def test_class():
     assert issubclass(JSONParser, BaseParser)
 
 
-def test_csv_parser():
-    assert JSONParser.parse('{"a": 1}') == {"a": 1}
+def test_json_parser():
+    assert JSONParser.parse({"file_contents": '{"a": 1}'}) == {"a": 1}

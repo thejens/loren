@@ -4,11 +4,11 @@ from loren.parsers.base_parser import BaseParser
 
 class PyParser(BaseParser):
     @staticmethod
-    def parse(file_contents: str, **kwargs) -> Dict[str, Any]:
+    def parse(data: Dict[str, str], **kwargs) -> Dict[str, Any]:
         try:
-            file_contents = file_contents.decode("utf-8")
-        except (UnicodeDecodeError, AttributeError):
-            pass
+            file_contents = data["file_contents"].decode("utf-8")
+        except AttributeError:
+            file_contents = data["file_contents"]
         local_vars: Dict[str, Any] = {}
         global_vars: Dict[str, Any] = {}
         exec(file_contents, global_vars, local_vars)

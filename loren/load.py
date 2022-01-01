@@ -1,19 +1,18 @@
 import os
-import functools
-import importlib
 
+from importlib import import_module
 from collections.abc import Mapping
 from typing import Dict, Any, Type, List
-from functools import cached_property
+from functools import cached_property, lru_cache
 from loren.parsers.base_parser import BaseParser
 from loren.utilities.file_reader import LorenFileReader
 from loren.utilities.configuration import get_configuration
 
 
-@functools.lru_cache()
+@lru_cache()
 def get_parser_class(class_ref) -> Type[BaseParser]:
     return getattr(
-        importlib.import_module(".".join(class_ref.split(".")[:-1])),
+        import_module(".".join(class_ref.split(".")[:-1])),
         class_ref.split(".")[-1],
     )
 
@@ -114,22 +113,18 @@ class LorenDict(dict):
                 additional_args=self.additional_args,
             )
         file_contents = LorenFileReader.read(path)
-        parsed_file_contents = file_contents
         for file_extension in reversed(path.strip(".").split(".")[1:]):
-            if isinstance(parsed_file_contents, dict):
-                parsed_file_contents = parsed_file_contents["file_contents"]
-
             parser_class_path = self.config["file_handlers"].get(
                 file_extension, self.config["file_handlers"]["*"]
             )
             parser_class = get_parser_class(parser_class_path)
-            parsed_file_contents = parser_class.parse(
-                file_contents=parsed_file_contents,
+            file_contents = parser_class.parse(
+                data=file_contents,
                 file_path=path,
                 root_path=self.config["base_path"],
                 additional_args=self.additional_args,
             )
-        return parsed_file_contents
+        return file_contents
 
     def to_dict(self) -> Dict[str, Any]:
         self._init_keys()
@@ -154,7 +149,7 @@ class LorenDict(dict):
         return source_files
 
     def _ignore_func(self, item: os.DirEntry):
-        return self.config["ignore"].match_file(
+        return self.config["ignore_paths"].match_file(
             item.path[len(self.config["base_path"]) + 1 :]
             + ("/" if item.is_dir() else "")
         )

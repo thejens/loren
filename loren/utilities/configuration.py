@@ -2,6 +2,7 @@ import yaml
 import os
 import pathspec
 
+CONFIG_FILE_NAME = ".loren.yml"
 DEFAULT_CONFIG = {
     "file_handlers": {
         "yaml": "loren.parsers.yaml_parser.YamlParser",
@@ -24,19 +25,24 @@ DEFAULT_CONFIG = {
 
 
 def init_configuration(path):
-    with open(path, "w+") as file:
+    with open(os.path.join(path, CONFIG_FILE_NAME), "w+") as file:
         yaml.dump(DEFAULT_CONFIG, file)
 
 
 def get_configuration(path):
     try:
-        with open(os.path.join(path, ".loren.yml"), "r") as f:
+        with open(os.path.join(path, CONFIG_FILE_NAME), "r") as f:
             config = yaml.safe_load(f)
-    except (FileNotFoundError, NotADirectoryError):
-        config = DEFAULT_CONFIG
+            if "file_handlers" not in config:
+                config["file_handlers"] = DEFAULT_CONFIG["file_handlers"].copy()
+            if "ignore" not in config:
+                config["ignore"] = []
 
-    config["ignore"] = pathspec.PathSpec.from_lines(
-        "gitwildmatch", config.get("ignore", [])
+    except (FileNotFoundError, NotADirectoryError):
+        config = DEFAULT_CONFIG.copy()
+
+    config["ignore_paths"] = pathspec.PathSpec.from_lines(
+        "gitwildmatch", config["ignore"]
     )
     config["base_path"] = path
     return config
