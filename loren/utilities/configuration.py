@@ -25,6 +25,7 @@ DEFAULT_CONFIG = {
 
 
 def init_configuration(path):
+    os.makedirs(path, exist_ok=True)
     with open(os.path.join(path, CONFIG_FILE_NAME), "w+") as file:
         yaml.dump(DEFAULT_CONFIG, file)
 

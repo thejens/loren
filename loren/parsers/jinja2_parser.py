@@ -21,6 +21,6 @@ class Jinja2Parser(BaseParser):
         template = templateEnv.from_string(file_contents)
         return {
             "file_contents": template.render(
-                env=os.environ, re=re, **template_functions, **additional_args
+                env=dict(os.environ), re=re, **template_functions, **additional_args
             )
         }

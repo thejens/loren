@@ -127,12 +127,11 @@ def test_template_basic(tmp_path):
     ) as expected_result_file:
         assert result_file.read() == expected_result_file.read()
 
+
 def test_template_multiple_files(tmp_path):
     root_path = EXAMPLES_DIR.joinpath("template_multiple_files")
     conf = LorenDict(
-        root_path.joinpath("input_config"),
-        lazy=False,
-        preserve_file_suffix=False
+        root_path.joinpath("input_config"), lazy=False, preserve_file_suffix=False
     )
     assert conf
     render(
@@ -144,15 +143,16 @@ def test_template_multiple_files(tmp_path):
     assert os.listdir(tmp_path) == os.listdir(root_path.joinpath("example_results"))
 
     for file in os.listdir(tmp_path):
-        with open(tmp_path.joinpath(file), 'r') as rendered, open(root_path.joinpath("example_results", file)) as expected:
+        with open(tmp_path.joinpath(file), "r") as rendered, open(
+            root_path.joinpath("example_results", file)
+        ) as expected:
             assert rendered.read() == expected.read()
+
 
 def test_template_airflow_dag(tmp_path):
     root_path = EXAMPLES_DIR.joinpath("template_airflow_dag")
     conf = LorenDict(
-        root_path.joinpath("config"),
-        lazy=False,
-        preserve_file_suffix=False
+        root_path.joinpath("config"), lazy=False, preserve_file_suffix=False
     )
     assert conf
     render(
@@ -161,16 +161,20 @@ def test_template_airflow_dag(tmp_path):
         configurations=conf,
         strict=False,
     )
+
     def recursive_dict_match(rendered_path, expected_path):
         assert sorted(os.listdir(rendered_path)) == sorted(os.listdir(expected_path))
         for file in os.listdir(rendered_path):
             if os.path.isdir(rendered_path.joinpath(file)):
                 recursive_dict_match(
-                    rendered_path.joinpath(file),
-                    expected_path.joinpath(file)
+                    rendered_path.joinpath(file), expected_path.joinpath(file)
                 )
             else:
-                with open(rendered_path.joinpath(file), 'r') as rendered, open(expected_path.joinpath(file)) as expected:
-                    assert rendered.read() == expected.read()
-    
+                with open(rendered_path.joinpath(file), "r") as rendered, open(
+                    expected_path.joinpath(file)
+                ) as expected:
+                    assert rendered.read().replace("\n", "") == expected.read().replace(
+                        "\n", ""
+                    )
+
     recursive_dict_match(tmp_path, root_path.joinpath("result_dags"))
