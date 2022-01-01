@@ -17,7 +17,11 @@ def _read_template(template_path: str, strict: bool) -> jinja2.Template:
 
 
 def render(
-    template_path: str, output_path: str, configurations: dict, strict: bool = False
+    template_path: str,
+    output_path: str,
+    configurations: dict,
+    strict: bool = False,
+    dry_run: bool = False,
 ) -> None:
     files = re.split(
         r"^=>",
@@ -27,6 +31,10 @@ def render(
         0,
         re.MULTILINE,
     )
+    if dry_run:
+        print("Dry run successful")
+        return
+
     if len(files) == 1:
         with codecs.open(output_path, "w", "utf-8") as f:
             f.write(str(files[0]))

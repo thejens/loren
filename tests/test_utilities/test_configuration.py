@@ -28,7 +28,7 @@ def test_import_handlers():
 def test_init_configuration(tmp_path):
     init_configuration(str(tmp_path))
     with open(f"{tmp_path}/.loren.yml", "r+") as configuration:
-        config = yaml.load(configuration)
+        config = yaml.safe_load(configuration)
     assert config == DEFAULT_CONFIG
 
 

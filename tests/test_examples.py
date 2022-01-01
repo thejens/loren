@@ -173,8 +173,8 @@ def test_template_airflow_dag(tmp_path):
                 with open(rendered_path.joinpath(file), "r") as rendered, open(
                     expected_path.joinpath(file)
                 ) as expected:
-                    assert rendered.read().replace("\n", "") == expected.read().replace(
-                        "\n", ""
+                    assert sorted(rendered.read().replace("\n", "")) == sorted(
+                        expected.read().replace("\n", "")
                     )
 
     recursive_dict_match(tmp_path, root_path.joinpath("result_dags"))
