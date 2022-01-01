@@ -4,4 +4,3 @@ CREATE TABLE table_1
         FROM some_table
         WHERE date == "{{ ds }}"
   )
-

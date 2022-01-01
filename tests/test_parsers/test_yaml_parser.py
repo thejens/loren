@@ -6,5 +6,5 @@ def test_class():
     assert issubclass(YamlParser, BaseParser)
 
 
-def test_csv_parser():
-    assert YamlParser.parse("test: a") == {"test": "a"}
+def test_yaml_parser():
+    assert YamlParser.parse({"file_contents": "test: a"}) == {"test": "a"}
