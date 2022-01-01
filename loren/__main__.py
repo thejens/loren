@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Any, List
 from pprint import pprint
 from argparse import ArgumentParser
 from loren.load import LorenDict
@@ -7,13 +8,24 @@ from loren.render import render
 from loren.utilities.configuration import init_configuration
 from os.path import dirname
 
+def _parse_configuration_path(configuration_path: List[str]) -> Any:
+    if type(configuration_path[0]) is list:
+        configuration_path = [item for sublist in configuration_path for item in sublist]
+    
+    if ":" in configuration_path[0]:
+        configuration_path = dict(item.split(":") for item in configuration_path)
+
+    elif len(configuration_path) == 1:
+        configuration_path = configuration_path[0]
+    
+    return configuration_path
 
 def action_render():
     parser = ArgumentParser(
         description="Render a set of files based on a template and conf"
     )
     parser.add_argument("--template-path", "-t", type=str, required=True)
-    parser.add_argument("--configuration-path", "-c", type=str, required=True)
+    parser.add_argument("--configuration-path", "-c", nargs='+', type=str, required=True, action='append')
     parser.add_argument("--output-path", "-o", type=str, default="rendered")
     parser.add_argument("--schema-path", "-s", type=str, default=None)
     parser.add_argument("--strict", default=False, action="store_true")
@@ -21,7 +33,7 @@ def action_render():
     unknown_args = package_unknown_args(unknown_args)
 
     configurations = LorenDict(
-        args.configuration_path, additional_args=unknown_args, lazy=False
+        _parse_configuration_path(args.configuration_path), additional_args=unknown_args, lazy=False
     )
     if args.schema_path:
         configurations.validate(args.schema_path)
@@ -39,11 +51,12 @@ def action_validate():
     parser = ArgumentParser(
         description="Validate a configuration result using jsonschema"
     )
-    parser.add_argument("--configuration-path", "-c", type=str, required=True)
+    parser.add_argument("--configuration-path", "-c", nargs='+', type=str, required=True)
     parser.add_argument("--schema-path", "-s", type=str, required=True)
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
-    LorenDict(args.configuration_path, additional_args=unknown_args).validate(
+
+    LorenDict(_parse_configuration_path(args.configuration_path), additional_args=unknown_args).validate(
         args.schema_path
     )
     print("Configuration is valid")
@@ -51,24 +64,25 @@ def action_validate():
 
 def action_print():
     parser = ArgumentParser(description="Print a parsed configuration")
-    parser.add_argument("--configuration-path", "-c", type=str, required=True)
+    parser.add_argument("--configuration-path", "-c", nargs='+', type=str, required=True)
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
-    pprint(LorenDict(args.configuration_path, additional_args=unknown_args).to_dict())
+    pprint(LorenDict(_parse_configuration_path(args.configuration_path), additional_args=unknown_args).to_dict())
 
 
 def action_dump():
     parser = ArgumentParser(description="Print a parsed configuration")
-    parser.add_argument("--configuration-path", "-c", type=str, required=True)
+    parser.add_argument("--configuration-path", "-c", nargs='+', type=str, required=True)
     parser.add_argument("--output-path", "-o", type=str, required=True)
     args, unknown_args = parser.parse_known_args()
     unknown_args = package_unknown_args(unknown_args)
+
     if dirname(args.output_path):
         os.makedirs(dirname(args.output_path), exist_ok=True)
     with open(args.output_path, "w+") as f:
         json.dump(
             LorenDict(
-                args.configuration_path, additional_args=unknown_args, lazy=False
+                _parse_configuration_path(args.configuration_path), additional_args=unknown_args, lazy=False
             ),
             f,
         )
@@ -76,9 +90,16 @@ def action_dump():
 
 def action_init():
     parser = ArgumentParser(description="Print a parsed configuration")
-    parser.add_argument("--configuration-path", "-c", type=str, required=True)
+    parser.add_argument("--configuration-path", "-c", nargs='+', type=str, required=True, action='append')
     args, _ = parser.parse_known_args()
-    init_configuration(args.configuration_path)
+    
+    if type(args.configuration_path[0]) is list:
+        directories = [item.split(":")[-1] for sublist in args.configuration_path for item in sublist]
+    else:
+        directories = [item.split(":")[-1] for item in args.configuration_path]
+    
+    for path in directories:
+        init_configuration(path)
 
 
 def package_unknown_args(arglist):
