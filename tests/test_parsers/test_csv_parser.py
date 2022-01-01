@@ -10,7 +10,7 @@ def test_class():
 
 
 def test_csv_parser():
-    assert CSVParser.parse({'file_contents': csv_data}) == {
+    assert CSVParser.parse({"file_contents": csv_data}) == {
         "rows": [
             {"a": "1", "b": "2", "c": "3"},
             {"a": "4", "b": "5", "c": "6"},
@@ -20,7 +20,7 @@ def test_csv_parser():
 
 
 def test_tsv_parser():
-    assert TSVParser.parse({'file_contents': csv_data.replace(",", "\t")}) == {
+    assert TSVParser.parse({"file_contents": csv_data.replace(",", "\t")}) == {
         "rows": [
             {"a": "1", "b": "2", "c": "3"},
             {"a": "4", "b": "5", "c": "6"},

@@ -1,5 +1,6 @@
 from typing import Dict
 
+
 class LorenFileReader:
     @staticmethod
     def read(file_path) -> Dict[str, str]:

@@ -7,4 +7,4 @@ def test_class():
 
 
 def test_yaml_parser():
-    assert YamlParser.parse({'file_contents': "test: a"}) == {"test": "a"}
+    assert YamlParser.parse({"file_contents": "test: a"}) == {"test": "a"}

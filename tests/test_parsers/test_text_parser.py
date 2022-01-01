@@ -7,4 +7,6 @@ def test_class():
 
 
 def test_csv_parser():
-    assert TextParser.parse({'file_contents': "a = 1".encode('utf-8')}) == {"file_contents": "a = 1"}
+    assert TextParser.parse({"file_contents": "a = 1".encode("utf-8")}) == {
+        "file_contents": "a = 1"
+    }

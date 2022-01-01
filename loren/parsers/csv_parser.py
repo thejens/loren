@@ -20,5 +20,6 @@ class CSVParser(BaseParser):
             "rows": list(csv.DictReader(file_contents.splitlines(), delimiter=cls.sep))
         }
 
+
 class TSVParser(CSVParser):
     sep = "\t"

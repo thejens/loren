@@ -4,7 +4,6 @@ from loren.parsers.base_parser import BaseParser
 
 
 class JSONParser(BaseParser):
-    
     @classmethod
     def parse(cls, data: Dict[str, str], **kwargs) -> Dict[str, Any]:
         try:

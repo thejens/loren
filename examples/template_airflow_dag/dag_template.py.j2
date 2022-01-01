@@ -7,12 +7,12 @@ from airflow.utils.dates import days_ago
 
 
 dag = DAG(
-    dag_id="{{ name }}",
-    schedule_interval="{{ conf.schedule_interval }}",
+    dag_id='{{ name }}',
+    schedule_interval='{{ conf.schedule_interval }}',
     start_date=days_ago({{ conf.start_days_ago }}),
     dagrun_timeout={{ conf.dagrun_timeout }},
     tags=['example', 'example2'],
-    params={"example_key": "example_value"},
+    params={'example_key': 'example_value'},
 )
 
 {% for sql_database, tables in tasks.items() %}
@@ -28,11 +28,11 @@ dag = DAG(
 {% for sql_database, tables in tasks.items() %}
 {%- for table_name, task in tables.items() if task.dag == name %}
 {%- for dependency in task.depends_on %}
-{{ dependency.replace(".", "_") }}_task >> {{sql_database}}_{{ table_name }}_task
+{{ dependency.replace('.', '_') }}_task >> {{sql_database}}_{{ table_name }}_task
 {% endfor -%}
 {% endfor -%}
 {% endfor %}
-if __name__ == "__main__":
+if __name__ == '__main__':
     dag.cli()
 {% endfor %}
 {% for sql_database, tables in tasks.items() %}
