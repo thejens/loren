@@ -1,6 +1,7 @@
 from loren.load import LorenDict
 from loren.render import render
 from pathlib import Path
+from jsonschema.exceptions import ValidationError
 import pytest
 import json
 import os
@@ -86,7 +87,6 @@ def test_config_with_non_matching_jsonschema(tmp_path):
             },
             schema_file,
         )
-    from jsonschema.exceptions import ValidationError
 
     with pytest.raises(ValidationError):
         conf.validate(schema_path)

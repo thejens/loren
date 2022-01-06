@@ -1,4 +1,4 @@
-{% for name, conf in dags.items() %}
+{% for name, conf in dags.items() -%}
 =>{{ name }}.py
 from datetime import timedelta
 from airflow import DAG
