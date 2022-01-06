@@ -13,6 +13,9 @@ DEFAULT_CONFIG = {
         "tsv": "loren.parsers.csv_parser.TSVParser",
         "j2": "loren.parsers.jinja2_parser.Jinja2Parser",
         "jinja2": "loren.parsers.jinja2_parser.Jinja2Parser",
+        "jpg": "loren.parsers.base64_parser.Base64Parser",
+        "png": "loren.parsers.base64_parser.Base64Parser",
+        "gif": "loren.parsers.base64_parser.Base64Parser",
         "*": "loren.parsers.text_parser.TextParser",
     },
     "ignore": [

@@ -13,11 +13,14 @@ def test_jinja2_parser_basic():
 
 
 def test_jinja2_parser_additional_args():
-    assert Jinja2Parser.parse(
-        {"file_contents": "This is a {{ some_arg }}"},
-        root_path="",
-        additional_args={"some_arg": "test"},
-    ) == {"file_contents": "This is a test"}
+    assert (
+        Jinja2Parser.parse(
+            {"file_contents": "This is a {{ some_arg }}"},
+            root_path="",
+            additional_args={"some_arg": "test"},
+        )
+        == {"file_contents": "This is a test"}
+    )
 
 
 def test_jinja2_parser_additional_macro(tmp_path):
