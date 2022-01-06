@@ -4,6 +4,7 @@ import codecs
 from jinja2 import Undefined, StrictUndefined
 from pathlib import Path
 from os import makedirs, environ
+from os.path import dirname
 from typing import List, Union, Optional
 
 template_functions = {"list": list, "dict": dict, "len": len, "range": range}
