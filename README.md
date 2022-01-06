@@ -85,17 +85,14 @@ Pointing Loren to create a configuration from `folder` would generate:
 ```
 {
   "file1": {
-    "foo": "bar",
-    "_path": "files/file1.yaml"
+    "foo": "bar"
   },
   "file2": {
-    "file_contents": "Some text\nin a text-file",
-    "_path": "files/file2.txt"
+    "file_contents": "Some text\nin a text-file"
   },
   "sub_folder": {
     "file3": {
-      "file_contents": "A man walks into a bar",
-      "_path": "files/sub_folder/file3.txt.j2"
+      "file_contents": "A man walks into a bar"
     },
   }
 }
@@ -132,42 +129,19 @@ swiss army knife for generating complex file structures from simple
 configurations.
 
 ### Configuring the Configuration
-Above shows how files are treated by default, Loren also respects two dotfiles
+Above shows how files are treated by default, Loren also respects a config file
 in the configuration path.
 
-`.lorenignore`
-and
-`.loren.yaml`
+`.loren.yml`
 
-`.lorenignore` works like `.gitignore` and tells Loren to ignore files or
-directories when parsing configurations. This is useful for instance when you
-want to use some files as jinja2 templates without including the files themselves
-in the `configuration`.
+This file tells Loren to ignore files or
+directories when parsing configurations, and what parsers to use for file extensions. 
 
-`.loren.yaml` specifies two keys, `loaders` and `parsers`, these are references
-to what functions to use to load files from disk, and to parse loaded files.
-
-The defaults look like:
-```
-loaders:
-  '*': loren.file_loaders.text_loader.TextLoader
-  j2: loren.file_loaders.jinja2_loader.Jinja2Loader
-  jinja2: loren.file_loaders.jinja2_loader.Jinja2Loader
-  jpg: loren.file_loaders.base64_loader.URLSafeBase64Loader
-  png: loren.file_loaders.base64_loader.URLSafeBase64Loader
-parsers:
-  '*': loren.parsers.text_parser.TextParser
-  csv: loren.parsers.csv_parser.CSVParser
-  json: loren.parsers.json_parser.JSONParser
-  py: loren.parsers.python_parser.PyParser
-  tsv: loren.parsers.csv_parser.TSVParser
-  yaml: loren.parsers.yaml_parser.YamlParser
-  yml: loren.parsers.yaml_parser.YamlParser
-```
-
-The keys are file extensions, and the `*` is the default loader to use for
+The keys are file extensions, and the `*` is the default parser to use for
 other files. Omiting the `*` will make Loren crash if it comes across a file
 it doesn't have support for.
+
+See the `init` command for how to generate a default config file.
 
 ## Install
 For now, clone this repo or run:

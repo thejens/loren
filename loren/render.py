@@ -6,14 +6,17 @@ from pathlib import Path
 from os import makedirs, environ
 from typing import List, Union, Optional
 
-
 template_functions = {"list": list, "dict": dict, "len": len, "range": range}
 
 
 def _read_template(template_path: str, strict: bool) -> jinja2.Template:
+    templateEnv = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(dirname(template_path)),
+        undefined=StrictUndefined if strict else Undefined,
+    )
     with open(template_path, "r") as template_file:
-        return jinja2.Template(
-            template_file.read(), undefined=StrictUndefined if strict else Undefined
+        return templateEnv.from_string(
+            template_file.read(),
         )
 
 
