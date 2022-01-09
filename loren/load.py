@@ -257,6 +257,3 @@ class LorenDictMapping(LorenDict):
             additional_args=additional_args,
             populated_keys=populated_keys,
         )
-
-
-print(LorenDict(path={"a": "examples/config_basic/input_config"}, lazy=False))
