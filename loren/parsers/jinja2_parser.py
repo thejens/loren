@@ -12,6 +12,7 @@ class Jinja2Parser(BaseParser):
     def parse(
         cls, data: Dict[str, str], root_path, additional_args, **kwargs
     ) -> Dict[str, str]:
+        additional_args = additional_args or {}
         templateEnv = jinja2.Environment(loader=jinja2.FileSystemLoader(root_path))
         try:
             file_contents = data["file_contents"].decode("utf-8")

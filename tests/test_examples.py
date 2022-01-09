@@ -2,6 +2,7 @@ from loren.load import LorenDict
 from loren.render import render
 from pathlib import Path
 from jsonschema.exceptions import ValidationError
+from unittest import TestCase
 import pytest
 import json
 import os
@@ -19,13 +20,13 @@ def test_config_basic():
         configuration_path.joinpath("input_config"),
         lazy=False,
         preserve_file_suffix=False,
-    ).to_dict()
+    )
     assert conf
     with open(
-        configuration_path.joinpath("example_result.json"), "r"
+        configuration_path.joinpath("example_result.json"), "r", encoding="utf-8"
     ) as expected_result_file:
         expected_result = json.load(expected_result_file)
-    assert conf == expected_result
+    TestCase().assertDictEqual(conf, expected_result)
 
 
 def test_config_advanced():
@@ -34,13 +35,13 @@ def test_config_advanced():
         configuration_path.joinpath("input_config"),
         lazy=False,
         preserve_file_suffix=False,
-    ).to_dict()
+    )
     assert conf
     with open(
         configuration_path.joinpath("example_result.json"), "r"
     ) as expected_result_file:
         expected_result = json.load(expected_result_file)
-    assert conf == expected_result
+    TestCase().assertDictEqual(conf, expected_result)
 
 
 def test_config_with_jinja2():
@@ -50,13 +51,13 @@ def test_config_with_jinja2():
         lazy=False,
         preserve_file_suffix=False,
         additional_args={"parameter_from_call": "test"},
-    ).to_dict()
+    )
     assert conf
     with open(
         configuration_path.joinpath("example_result.json"), "r"
     ) as expected_result_file:
         expected_result = json.load(expected_result_file)
-    assert conf == expected_result
+    TestCase().assertDictEqual(conf, expected_result)
 
 
 def test_config_with_matching_jsonschema():

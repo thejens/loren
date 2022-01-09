@@ -12,6 +12,12 @@ def test_jinja2_parser_basic():
     ) == {"file_contents": "This is a test"}
 
 
+def test_jinja2_parser_no_additional_args():
+    assert Jinja2Parser.parse(
+        {"file_contents": "This is a {{ 'test' }}"}, root_path="", additional_args=None
+    ) == {"file_contents": "This is a test"}
+
+
 def test_jinja2_parser_additional_args():
     assert (
         Jinja2Parser.parse(

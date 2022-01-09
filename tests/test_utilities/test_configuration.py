@@ -1,11 +1,11 @@
-import yaml
-from loren.utilities.configuration import (
-    DEFAULT_CONFIG,
-    LorenConfiguration
-)
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-function-docstring
 from importlib import import_module
-from pathspec.pathspec import PathSpec
 from pathlib import PosixPath
+import yaml
+from pathspec.pathspec import PathSpec
+from loren.utilities.configuration import DEFAULT_CONFIG, LorenConfiguration
+
 
 def test_default_config() -> None:
     assert isinstance(DEFAULT_CONFIG, dict)
@@ -25,15 +25,15 @@ def test_import_handlers() -> None:
 
 
 def test_init_configuration(tmp_path: PosixPath) -> None:
-    LorenConfiguration(str(tmp_path)).dump_configuration()
-    with open(f"{tmp_path}/.loren.yml", "r+") as configuration:
+    LorenConfiguration(tmp_path).dump_configuration()
+    with open(f"{tmp_path}/.loren.yml", "r+", encoding="utf-8") as configuration:
         config = yaml.safe_load(configuration)
     assert config == DEFAULT_CONFIG
 
 
 def test_get_configuration_no_file(tmp_path: PosixPath) -> None:
-    conf = LorenConfiguration(str(tmp_path))
-    assert conf.base_path == str(tmp_path)
+    conf = LorenConfiguration(tmp_path)
+    assert conf.base_path == tmp_path
     assert isinstance(conf.ignore_paths, PathSpec)
 
 
@@ -41,7 +41,7 @@ def test_get_configuration_file_exists(tmp_path: PosixPath) -> None:
     with open(f"{tmp_path}/.loren.yml", "w+", encoding="utf-8") as configuration:
         configuration.write("ignore: ['templates*']")
 
-    conf = LorenConfiguration(str(tmp_path))
+    conf = LorenConfiguration(tmp_path)
     expected_conf = DEFAULT_CONFIG.copy()
     expected_conf["base_path"] = str(tmp_path)
     expected_conf["ignore"] = ["templates*"]
