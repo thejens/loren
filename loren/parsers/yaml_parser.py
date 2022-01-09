@@ -1,13 +1,19 @@
-import yaml
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=too-few-public-methods
 from typing import Dict, Any
+from pathlib import Path
+import yaml
 from loren.parsers.base_parser import BaseParser
 
 
 class YamlParser(BaseParser):
-    @staticmethod
-    def parse(data: Dict[str, str], **kwargs) -> Dict[str, Any]:
-        try:
-            file_contents = data["file_contents"].decode("utf-8")
-        except AttributeError:
-            file_contents = data["file_contents"]
-        return yaml.safe_load(file_contents)
+    @classmethod
+    def _parse(
+        cls,
+        data: Dict[str, str],
+        file_path: Path = None,
+        root_path: Path = None,
+        additional_args: Dict = None,
+    ) -> Dict[str, Any]:
+        return yaml.safe_load(data["file_contents"])

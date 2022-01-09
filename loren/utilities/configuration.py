@@ -26,7 +26,7 @@ DEFAULT_CONFIG: dict = {
         "jpg": "loren.parsers.base64_parser.Base64Parser",
         "png": "loren.parsers.base64_parser.Base64Parser",
         "gif": "loren.parsers.base64_parser.Base64Parser",
-        "*": "loren.parsers.text_parser.TextParser",
+        "*": "loren.parsers.base_parser.BaseParser",
     },
     "ignore": [
         ".loren.yml",
@@ -38,17 +38,10 @@ DEFAULT_CONFIG: dict = {
 
 
 class LorenConfiguration:
-    def dump_configuration(self, path: Path = None) -> None:
-
-        if path:
-            dump_path = path
-        else:
-            dump_path = self.base_path
-
-        os.makedirs(dump_path, exist_ok=True)
-        with open(
-            os.path.join(dump_path, CONFIG_FILE_NAME), "w+", encoding="utf-8"
-        ) as file:
+    @staticmethod
+    def create_default_configuration(path: Path) -> None:
+        os.makedirs(path, exist_ok=True)
+        with open(path.joinpath(CONFIG_FILE_NAME), "w", encoding="utf-8") as file:
             yaml.dump(DEFAULT_CONFIG, file)
 
     def __init__(self, path: Path = Path(".")):

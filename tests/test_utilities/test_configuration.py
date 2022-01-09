@@ -12,7 +12,7 @@ def test_default_config() -> None:
     assert "file_handlers" in DEFAULT_CONFIG
     assert isinstance(DEFAULT_CONFIG["file_handlers"], dict)
     assert (
-        DEFAULT_CONFIG["file_handlers"]["*"] == "loren.parsers.text_parser.TextParser"
+        DEFAULT_CONFIG["file_handlers"]["*"] == "loren.parsers.base_parser.BaseParser"
     )
     assert "ignore" in DEFAULT_CONFIG
     assert isinstance(DEFAULT_CONFIG["ignore"], list)
@@ -25,7 +25,7 @@ def test_import_handlers() -> None:
 
 
 def test_init_configuration(tmp_path: PosixPath) -> None:
-    LorenConfiguration(tmp_path).dump_configuration()
+    LorenConfiguration.create_default_configuration(tmp_path)
     with open(f"{tmp_path}/.loren.yml", "r+", encoding="utf-8") as configuration:
         config = yaml.safe_load(configuration)
     assert config == DEFAULT_CONFIG

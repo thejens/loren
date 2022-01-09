@@ -13,51 +13,171 @@ from loren.utilities.file_reader import LorenFileReader
 from loren.utilities.configuration import LorenConfiguration
 
 
+def _get_path(
+    path: Union[
+        Dict[Union[int, str], Union[str, Path]],
+        List[Union[str, Path]],
+        Union[str, Path],
+    ]
+) -> Union[Dict[Union[int, str], Path], List[Path], Path]:
+    if isinstance(path, Path):
+        return path
+    if isinstance(path, str):
+        return Path(path)
+    if isinstance(path, Dict):
+        return {key: Path(p) for key, p in path.items()}
+    if isinstance(path, List):
+        return [Path(p) for p in path]
+    raise TypeError
+
+
 class LorenDict(dict):
+    path: Path = NotImplemented
+    path_list: List[Path] = NotImplemented
+    path_dict: Dict[Union[str, int], Path] = NotImplemented
+
     def __new__(
         cls,  # pylint: disable=unused-argument
-        path: Union[str, Path] = ".",
-        paths: Union[
-            Dict[Union[int, str], Union[str, Path]], List[Union[str, Path]]
+        path: Union[
+            Dict[Union[int, str], Union[str, Path]],
+            List[Union[str, Path]],
+            Union[str, Path],
         ] = None,
         **kwargs: Any,
     ) -> "LorenDict":
-        if not paths:
-            if isinstance(path, str):
-                path = Path(path)
-            return super().__new__(LorenDict)
-
-        elif isinstance(paths, list):
+        if path is None or isinstance(path, (str, Path)):
             if path:
-                paths.append(path)
-            paths = [Path(p) if not isinstance(p, Path) else p for p in paths]
+                typed_path: Path = Path(path)
+            else:
+                typed_path = Path(".")
+
+            if typed_path.is_file():
+                return super().__new__(LorenDictFile)
+            else:
+                return super().__new__(LorenDictFolder)
+
+        elif isinstance(path, list):
             return super().__new__(LorenDictList)
 
-        elif isinstance(paths, dict):
-            if path and not "path" in paths:
-                paths["path"] = path
-
+        elif isinstance(path, dict):
             return super().__new__(LorenDictMapping)
 
         raise TypeError
 
+    def __init__(
+        self,  # pylint: disable=unused-argument
+        key: Union[str, int] = -1,
+        lazy: bool = True,
+        preserve_file_suffix: bool = False,
+        additional_args: dict = None,
+        populated_keys: dict = None,
+        configuration: LorenConfiguration = None,
+        **kwargs: Any,
+    ):
+        self.is_initiated = False
+        self.configuration = configuration
+        if populated_keys:
+            super().__init__(populated_keys)
+        else:
+            super().__init__()
+        self.lazy = lazy
+        self.preserve_file_suffix = preserve_file_suffix
+        self.additional_args = additional_args
+        self.key = key
+
+        if not lazy:
+            self._initiate()
+
     def initiate(self) -> None:
-        is_file = self.path.is_file()
+        raise NotImplementedError
 
-        if self.input_configuration:
-            self.configuration = self.input_configuration
+    def _initiate(self) -> None:
+        if not self.is_initiated:
+            self.initiate()
+        self.is_initiated = True
+
+    def initiate_all(self) -> None:
+        if not self.is_initiated:
+            self.initiate()
+        for child in self.values():
+            if isinstance(child, LorenDict):
+                child.initiate_all()
+
+    def to_dict(self) -> Dict[str, Any]:
+        self.initiate_all()
+        for key, child in self.items():
+            if isinstance(child, LorenDict):
+                self[key] = child.to_dict()
+        self["_path"] = str(self.path)
+        return dict(self)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
+
+    def __getitem__(self, key: str) -> Any:
+        if not self.is_initiated:
+            self._initiate()
+        return super().__getitem__(key)
+
+    def __repr__(self) -> str:
+        if self.is_initiated:
+            return f"{self.__class__.__name__}({super().__repr__()})"
         else:
-            if is_file:
-                self.configuration = LorenConfiguration(self.path.parent)
-            else:
-                self.configuration = LorenConfiguration(self.path)
+            return f"{self.__class__.__name__}(Not Initiated)"
 
-        if is_file:
-            self.initiate_file()
-        else:
-            self.initiate_folder()
+    def validate(self, schema_path: str) -> None:
+        with open(schema_path, "r", encoding="utf-8") as schema:
+            jsonschema.validate(self, json.load(schema))
 
-    def initiate_folder(self) -> None:
+
+class LorenDictFS(LorenDict):
+    def initiate(self) -> None:
+        raise NotImplementedError
+
+    def __init__(
+        self,
+        path: Union[str, Path] = ".",
+        key: Union[str, int] = -1,
+        lazy: bool = True,
+        preserve_file_suffix: bool = False,
+        additional_args: dict = None,
+        populated_keys: dict = None,
+        configuration: LorenConfiguration = None,
+    ):
+        self.path = Path(path)
+        super().__init__(
+            key=key,
+            lazy=lazy,
+            preserve_file_suffix=preserve_file_suffix,
+            additional_args=additional_args,
+            populated_keys=populated_keys,
+            configuration=configuration,
+        )
+
+
+class LorenDictFile(LorenDictFS):
+    def initiate(self) -> None:
+        if not self.configuration:
+            self.configuration = LorenConfiguration(self.path.parent)
+
+        file_contents = LorenFileReader.read(self.path)
+        for file_extension in reversed(str(self.path).strip(".").split(".")[1:]):
+            parser_class = self.configuration.get_parser_class(file_extension)
+            file_contents = parser_class.parse(
+                data=file_contents,
+                file_path=self.path,
+                root_path=self.configuration.base_path,
+                additional_args=self.additional_args,
+            )
+        for key, value in file_contents.items():
+            self[key] = value
+
+
+class LorenDictFolder(LorenDictFS):
+    def initiate(self) -> None:
+        if not self.configuration:
+            self.configuration = LorenConfiguration(self.path)
+
         files: Dict[str, List[Path]] = {}
         for file in self.path.iterdir():
             if self.configuration.is_ignored_file(file):
@@ -82,103 +202,27 @@ class LorenDict(dict):
                     configuration=self.configuration,
                 )
 
-        self.is_initiated = True
 
-    def initiate_file(self) -> None:
-        print(f"Loading {self.path}")
-        file_contents = LorenFileReader.read(self.path)
-        for file_extension in reversed(str(self.path).strip(".").split(".")[1:]):
-            parser_class = self.configuration.get_parser_class(file_extension)
-            file_contents = parser_class.parse(
-                data=file_contents,
-                file_path=self.path,
-                root_path=self.configuration.base_path,
+class LorenDictList(LorenDict):
+    def initiate(self) -> None:
+        for i, path in enumerate(self.paths):
+            self[i] = LorenDict(
+                path=path,
+                key=i,
+                lazy=self.lazy,
+                preserve_file_suffix=self.preserve_file_suffix,
                 additional_args=self.additional_args,
             )
-        for key, value in file_contents.items():
-            self[key] = value
-
-        self.is_initiated = True
-
-    def initiate_all(self) -> None:
-        if not self.is_initiated:
-            self.initiate()
-        for child in self.values():
-            if isinstance(child, LorenDict):
-                child.initiate_all()
-
-    def to_dict(self) -> Dict[str, Any]:
-        self.initiate_all()
-        for key, child in self.items():
-            if isinstance(child, LorenDict):
-                self[key] = child.to_dict()
-        self["_path"] = str(self.path)
-        return dict(self)
-
-    def to_json(self) -> str:
-        return json.dumps(self.to_dict())
 
     def __init__(
         self,
-        path: Union[str, Path] = ".",
-        key: Union[str, int] = -1,
+        path: List[Union[str, Path]],
         lazy: bool = True,
         preserve_file_suffix: bool = False,
         additional_args: dict = None,
         populated_keys: dict = None,
-        configuration: LorenConfiguration = None,
     ):
-        if populated_keys:
-            super().__init__(populated_keys)
-        else:
-            super().__init__()
-
-        self.lazy = lazy
-        self.preserve_file_suffix = preserve_file_suffix
-        self.additional_args = additional_args
-        self.key = key
-        self.is_initiated = False
-        self.path: Path = Path(path) if not isinstance(path, Path) else path
-        self.key = key
-        self.input_configuration: Optional[LorenConfiguration] = configuration
-
-        if not lazy:
-            self.initiate()
-
-    def __getitem__(self, key: str) -> Any:
-        if not self.is_initiated:
-            self.initiate()
-        return super().__getitem__(key)
-
-    def __repr__(self) -> str:
-        if self.is_initiated:
-            return super().__repr__()
-        else:
-            return f"{self.__class__.__name__}(Not Initiated)"
-
-    def validate(self, schema_path: str) -> None:
-        with open(schema_path, "r", encoding="utf-8") as schema:
-            jsonschema.validate(self, json.load(schema))
-
-
-
-class LorenDictList(LorenDict):
-    def __init__(
-        self,
-        paths: List[Path],
-        lazy: bool = True,
-        preserve_file_suffix: bool = False,
-        additional_args: dict = None,
-    ):
-        populated_keys: Dict[int, LorenDict] = {}
-        for i, path in enumerate(paths):
-            populated_keys[i] = LorenDict(
-                path=path,
-                key=i,
-                lazy=lazy,
-                preserve_file_suffix=preserve_file_suffix,
-                additional_args=additional_args,
-            )
+        self.paths = [Path(p) for p in path]
         super().__init__(
             lazy=lazy,
             preserve_file_suffix=preserve_file_suffix,
@@ -188,22 +232,25 @@ class LorenDictList(LorenDict):
 
 
 class LorenDictMapping(LorenDict):
+    def initiate(self) -> None:
+        for key, path in self.paths.items():
+            self[key] = LorenDict(
+                path=path,
+                key=key,
+                lazy=self.lazy,
+                preserve_file_suffix=self.preserve_file_suffix,
+                additional_args=self.additional_args,
+            )
+
     def __init__(
         self,
-        paths: Dict[str, Path],
+        path: Dict[str, Union[str, Path]],
         lazy: bool = True,
         preserve_file_suffix: bool = False,
         additional_args: dict = None,
+        populated_keys: dict = None,
     ):
-        populated_keys: Dict[str, LorenDict] = {}
-        for key, path in paths.items():
-            populated_keys[key] = LorenDict(
-                path=path,
-                key=key,
-                lazy=lazy,
-                preserve_file_suffix=preserve_file_suffix,
-                additional_args=additional_args,
-            )
+        self.paths = {key: Path(path) for key, path in path.items()}
         super().__init__(
             lazy=lazy,
             preserve_file_suffix=preserve_file_suffix,
@@ -212,13 +259,4 @@ class LorenDictMapping(LorenDict):
         )
 
 
-root_paths = {
-    "a": Path("examples").joinpath("template_airflow_dag").joinpath("config"),
-    "b": Path("examples").joinpath("config_basic").joinpath("input_config")
-}
-conf = LorenDict(
-    paths=root_paths, lazy=True, preserve_file_suffix=False
-)
-
-#conf.initiate_all()
-print(conf.to_json())
+print(LorenDict(path={"a": "examples/config_basic/input_config"}, lazy=False))
