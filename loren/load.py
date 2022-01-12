@@ -4,6 +4,7 @@
 # pylint: disable=missing-function-docstring
 try:
     import json
+    import yaml
     import jsonschema
 except ImportError:
     pass
@@ -127,7 +128,13 @@ class LorenDict(dict):
 
     def validate(self, schema_path: str) -> None:
         with open(schema_path, "r", encoding="utf-8") as schema:
-            jsonschema.validate(self, json.load(schema))
+            if schema_path.endswith(".json"):
+                parsed_schema = json.load(schema)
+            elif schema_path.endswith(".yaml") or schema_path.endswith(".yml"):
+                parsed_schema = yaml.load(schema)
+            else:
+                raise "Invalid file ending, supported file endings are [json, yml, yaml]"
+            jsonschema.validate(self, parsed_schema)
 
 
 class LorenDictFS(LorenDict):
