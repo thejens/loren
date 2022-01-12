@@ -129,12 +129,11 @@ class LorenDict(dict):
     def validate(self, schema_path: str) -> None:
         with open(schema_path, "r", encoding="utf-8") as schema:
             if schema_path.endswith(".json"):
-                parsed_schema = json.load(schema)
+                jsonschema.validate(self, json.load(schema))
             elif schema_path.endswith(".yaml") or schema_path.endswith(".yml"):
-                parsed_schema = yaml.load(schema)
+                jsonschema.validate(self, yaml.load(schema))
             else:
-                raise "Invalid file ending, supported file endings are [json, yml, yaml]"
-            jsonschema.validate(self, parsed_schema)
+                raise "Schema file has invalid file ending, supported file endings are [json, yml, yaml]"
 
 
 class LorenDictFS(LorenDict):
