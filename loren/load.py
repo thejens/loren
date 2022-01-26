@@ -4,10 +4,10 @@
 # pylint: disable=missing-function-docstring
 try:
     import json
-    import yaml
     import jsonschema
 except ImportError:
     pass
+import yaml
 from pathlib import Path
 from typing import Dict, Any, List, Union, Optional
 from loren.utilities.file_reader import LorenFileReader
@@ -131,7 +131,7 @@ class LorenDict(dict):
             if schema_path.endswith(".json"):
                 jsonschema.validate(self, json.load(schema))
             elif schema_path.endswith(".yaml") or schema_path.endswith(".yml"):
-                jsonschema.validate(self, yaml.load(schema))
+                jsonschema.validate(self, yaml.safe_load(schema))
             else:
                 raise "Schema file has invalid file ending, supported file endings are [json, yml, yaml]"
 
