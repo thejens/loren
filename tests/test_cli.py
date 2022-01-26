@@ -46,7 +46,7 @@ def test_render(tmp_path: Path) -> None:
         assert result_file.read() == expected_result_file.read()
 
 
-def test_validate(capsys: Any) -> None:
+def test_validate_json(capsys: Any) -> None:
     with patch.object(
         sys,
         "argv",
@@ -57,7 +57,26 @@ def test_validate(capsys: Any) -> None:
             "-s",
             str(
                 EXAMPLES_DIR.joinpath(
-                    "config_with_jsonschema", "example_jsonschema.json"
+                    "config_with_jsonschema", "example_schema.json"
+                )
+            ),
+        ],
+    ):
+        action_validate()
+    assert capsys.readouterr().out == "Configuration is valid\n"
+
+def test_validate_yaml(capsys: Any) -> None:
+    with patch.object(
+        sys,
+        "argv",
+        [
+            "validate",
+            "-c",
+            str(EXAMPLES_DIR.joinpath("config_with_jsonschema", "input_config")),
+            "-s",
+            str(
+                EXAMPLES_DIR.joinpath(
+                    "config_with_jsonschema", "example_schema.yaml"
                 )
             ),
         ],

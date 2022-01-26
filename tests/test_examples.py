@@ -70,7 +70,17 @@ def test_config_with_matching_jsonschema() -> None:
         lazy=False,
         preserve_file_suffix=False,
     )
-    schema_path = configuration_path.joinpath("example_jsonschema.json")
+    schema_path = configuration_path.joinpath("example_schema.json")
+    conf.validate(str(schema_path))
+
+def test_config_with_matching_yamlschema() -> None:
+    configuration_path = EXAMPLES_DIR.joinpath("config_with_jsonschema")
+    conf = LorenDict(
+        configuration_path.joinpath("input_config"),
+        lazy=False,
+        preserve_file_suffix=False,
+    )
+    schema_path = configuration_path.joinpath("example_schema.yaml")
     conf.validate(str(schema_path))
 
 
