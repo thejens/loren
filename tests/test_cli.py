@@ -55,15 +55,12 @@ def test_validate_json(capsys: Any) -> None:
             "-c",
             str(EXAMPLES_DIR.joinpath("config_with_jsonschema", "input_config")),
             "-s",
-            str(
-                EXAMPLES_DIR.joinpath(
-                    "config_with_jsonschema", "example_schema.json"
-                )
-            ),
+            str(EXAMPLES_DIR.joinpath("config_with_jsonschema", "example_schema.json")),
         ],
     ):
         action_validate()
     assert capsys.readouterr().out == "Configuration is valid\n"
+
 
 def test_validate_yaml(capsys: Any) -> None:
     with patch.object(
@@ -74,11 +71,7 @@ def test_validate_yaml(capsys: Any) -> None:
             "-c",
             str(EXAMPLES_DIR.joinpath("config_with_jsonschema", "input_config")),
             "-s",
-            str(
-                EXAMPLES_DIR.joinpath(
-                    "config_with_jsonschema", "example_schema.yaml"
-                )
-            ),
+            str(EXAMPLES_DIR.joinpath("config_with_jsonschema", "example_schema.yaml")),
         ],
     ):
         action_validate()

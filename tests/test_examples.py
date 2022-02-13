@@ -73,6 +73,7 @@ def test_config_with_matching_jsonschema() -> None:
     schema_path = configuration_path.joinpath("example_schema.json")
     conf.validate(str(schema_path))
 
+
 def test_config_with_matching_yamlschema() -> None:
     configuration_path = EXAMPLES_DIR.joinpath("config_with_jsonschema")
     conf = LorenDict(

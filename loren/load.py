@@ -14,24 +14,6 @@ from loren.utilities.file_reader import LorenFileReader
 from loren.utilities.configuration import LorenConfiguration
 
 
-def _get_path(
-    path: Union[
-        Dict[Union[int, str], Union[str, Path]],
-        List[Union[str, Path]],
-        Union[str, Path],
-    ]
-) -> Union[Dict[Union[int, str], Path], List[Path], Path]:
-    if isinstance(path, Path):
-        return path
-    if isinstance(path, str):
-        return Path(path)
-    if isinstance(path, Dict):
-        return {key: Path(p) for key, p in path.items()}
-    if isinstance(path, List):
-        return [Path(p) for p in path]
-    raise TypeError
-
-
 class LorenDict(dict):
     path: Path = NotImplemented
     path_list: List[Path] = NotImplemented
@@ -133,7 +115,9 @@ class LorenDict(dict):
             elif schema_path.endswith(".yaml") or schema_path.endswith(".yml"):
                 jsonschema.validate(self, yaml.safe_load(schema))
             else:
-                raise "Schema file has invalid file ending, supported file endings are [json, yml, yaml]"
+                raise NameError(
+                    "Schema file invalid, supported name suffixes are [json, yml, yaml]"
+                )
 
 
 class LorenDictFS(LorenDict):
