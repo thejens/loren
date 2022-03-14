@@ -1,1 +1,1 @@
-{"file_a": {"foo": "bar", "_path": "examples/config_with_sub_directories/input_config/file_a.yaml"}, "folder_a": {"folder_b": {"file_c": {"bar": "baz", "_path": "examples/config_with_sub_directories/input_config/folder_a/folder_b/file_c.yaml"}}}}
+{"file_a": {"foo": "bar"}, "folder_a": {"folder_b": {"file_c": {"bar": "baz"}}}}
