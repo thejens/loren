@@ -1,10 +1,19 @@
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=too-few-public-methods
 import json
 from typing import Dict, Any
-from .base_parser import BaseParser
+from pathlib import Path
+from loren.parsers.base_parser import BaseParser
 
 
 class JSONParser(BaseParser):
-
-    @staticmethod
-    def parse(file_contents: str) -> Dict[str, Any]:
-        return json.loads(file_contents)
+    @classmethod
+    def _parse(
+        cls,
+        data: Dict[str, str],
+        file_path: Path = None,
+        root_path: Path = None,
+        additional_args: Dict = None,
+    ) -> Dict[str, Any]:
+        return json.loads(data["file_contents"])

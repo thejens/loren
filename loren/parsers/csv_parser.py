@@ -1,20 +1,28 @@
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=too-few-public-methods
 import csv
 from typing import Dict, Any
-from .base_parser import BaseParser
+from pathlib import Path
+from loren.parsers.base_parser import BaseParser
 
 
 class CSVParser(BaseParser):
     sep = ","
 
     @classmethod
-    def _split_row(cls, row):
-        return row.split(cls.sep)
-
-    @classmethod
-    def parse(cls, file_contents: str) -> Dict[str, Any]:
-        return {"rows": list(
-            csv.DictReader(file_contents.splitlines(), delimiter=cls.sep)
-        )}
+    def _parse(
+        cls,
+        data: Dict[str, str],
+        file_path: Path = None,
+        root_path: Path = None,
+        additional_args: Dict = None,
+    ) -> Dict[str, Any]:
+        return {
+            "rows": list(
+                csv.DictReader(data["file_contents"].splitlines(), delimiter=cls.sep)
+            )
+        }
 
 
 class TSVParser(CSVParser):
