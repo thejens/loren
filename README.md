@@ -22,14 +22,7 @@ one file per section and have a script that merge the intelligently)
 Loren will create a `configuration` by parsing all files in a file-tree,
 or optionally, a single file. Files are parsed based on their extensions.
 For instance a `.yaml` file will be represented as the loaded python
- object in the `configuration`.
-
-If you use Loren as a python module you can parse a file tree into a
- `configuration` by calling the `parse` function in the `parser` module.
-  The resulting dict will be returned as is. If you call Loren from the
-  command line, you might want to use the `dump` function to dump the
-  `configuration` to disk, note that this requires the contents to be
-  json serializable.
+ object in the `configuration`. The files are made accessible as a dict-like datastructure.
 
 You can also give Loren a template file, which will be rendered based on
 the config using the `render` function in the `renderer` module. The funciton
