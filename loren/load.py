@@ -169,7 +169,7 @@ class LorenDictFolder(LorenDictFS):
             self.configuration = LorenConfiguration(self.path)
 
         files: Dict[str, List[Path]] = {}
-        for file in self.path.iterdir():
+        for file in sorted(self.path.iterdir()):
             if self.configuration.is_ignored_file(file):
                 continue
 
